@@ -17,7 +17,7 @@ from scipy.stats import halfnorm, norm
 sns.set_context("talk")
 def dprime(x,y):
     return stats.norm.ppf(x)-stats.norm.ppf(y)
-data=pd.read_csv('thunell.csv')
+data=pd.read_csv('data/dataT_T.csv')
 #%%
 def display_delta(model, x):
     # BFs based on density estimation (using kernel smoothing instead of spline)
