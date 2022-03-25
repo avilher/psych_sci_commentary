@@ -26,7 +26,6 @@ long=pd.melt(data, id_vars=['suje','DISTR'],
              value_vars=['2','3','4','5','6','7','8','9','10'],
         var_name='REPE', value_name='acc')#long format
 long['acc']=long['acc']/100# 0 to 1 values
-
 long[['REPE','DISTR']]=long[['REPE','DISTR']].astype(int)
 long.reset_index(inplace=True)
 long=long.sort_values(['suje','DISTR','REPE'],axis=0)
@@ -38,65 +37,65 @@ long=long.replace([np.inf, -np.inf], np.nan)
 
 
 
+
 #%% ONE DISTRACTOR, MODEL COMPARISON 
 
 one_dis=long[(long['DISTR']==1)&(long['REPE']<5)]
 one_dis['suje']=one_dis['suje'].astype('category')
-
 #Full model
 halfNormalPrior = Prior('HalfNormal',sigma=0.1)
 prior_full = {"REPE":halfNormalPrior,"1|suje":"narrow"}
 formula="p_first ~ REPE + (1|suje)"
 full_model = bmb.Model(data=one_dis,formula=formula,priors=prior_full)
 full_fitted = full_model.fit(cores=1, draws=3000,chains=1)
-
 #BAYES FACTOR
 posterior_kde = gaussian_kde(full_fitted.posterior['REPE'][:])
 posterior_0 = posterior_kde(0) 
 BF01 = halfnorm.pdf(0,scale=0.1)/posterior_0
 print (f'the Bayes Factor is {BF01}')
-
 #Null model
 prior_null = {"1|suje":"narrow"}
 formula_null="p_first ~ (1|suje)"
 null_model = bmb.Model(data=one_dis,formula=formula_null,priors=prior_null)
 null_fitted = null_model.fit(cores=1, draws=3000,chains=1)
-
 #Model comparison
 models_dict1 = {
     "full": full_fitted,
     "null": null_fitted}
 df_compare = az.compare(models_dict1,scale='deviance')
 az.plot_compare(df_compare, insample_dev=True);
-#%% Two distractors, model comparison
+
+
+
+
+#%% TWO DISTRACTROS MODEL COMPARISON
+
 two_dis=long[(long['DISTR']==2)&(long['REPE']<7)]
 two_dis['suje']=two_dis['suje'].astype('category')
-
 #FULL MODEL
 halfNormalPrior = Prior('HalfNormal',sigma=0.1)
 prior_full = {"REPE":halfNormalPrior,"1|suje":"narrow"}
 formula="p_first ~ REPE + (1|suje)"
 full_model = bmb.Model(data=two_dis,formula=formula,priors=prior_full)
 full_fitted = full_model.fit(cores=1, draws=3000,chains=1)
-
 #BAYES FACTOR
 posterior_kde = gaussian_kde(full_fitted.posterior['REPE'][:])
 posterior_0 = posterior_kde(0)
 BF01 = posterior_0/halfnorm.pdf(0,scale=0.1)
 print (f'the Bayes Factor is {BF01}')
-
 #Null model
 prior_null = {"1|suje":"narrow"}
 formula_null="p_first ~ (1|suje)"
 null_model = bmb.Model(data=two_dis,formula=formula_null,priors=prior_null)
 null_fitted = null_model.fit(cores=1, draws=3000,chains=1)
-
 #Model comparison
 models_dict2 = {
     "full": full_fitted,
     "null": null_fitted}
 df_compare2 = az.compare(models_dict2,scale='deviance')
 az.plot_compare(df_compare2, insample_dev=True);
+
+
 
 #%%Plotting deviance for 1 and 2 distractors
 f, (ax1, ax2) = plt.subplots(1, 2, sharey=True,
