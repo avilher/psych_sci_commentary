@@ -95,7 +95,7 @@ Bambi can be installed PyPI:
   long['p_first'] = np.where(long['REPE']==2,long['acc'],long['p_first'])#p_first at Repetition 2 = accuracy at Repetition 2
   long = long.replace([np.inf, -np.inf], np.nan)
   ```
-* FIGURE 
+* FIGURE 1(C left)
   ```sh
   single = long[(long['DISTR']==1)&(long['REPE']<5)]
   double = long[(long['DISTR']==2)&(long['REPE']<7)]
@@ -173,7 +173,7 @@ Bambi can be installed PyPI:
   df_compare2 = az.compare(models_dict2, scale = 'deviance')
   az.plot_compare(df_compare2, insample_dev = True);
   ```
-* PLOT DEVIANCE OF MODELS
+* PLOT DEVIANCE OF MODELS (FIGURE 1 C Right) 
   ```sh
   f, (ax1, ax2) = plt.subplots(1, 2, sharey = True,
                              gridspec_kw = {'hspace':1})
