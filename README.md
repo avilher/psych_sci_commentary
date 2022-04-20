@@ -115,7 +115,59 @@ Bambi can be installed PyPI:
            frameon = False, title = 'No. of distractors')
   fig.set_size_inches(7,6)
   ```
-
+* ONE DISTRACTOR MODEL COMPARISON
+  ```sh
+  one_dis = long[(long['DISTR'] == 1) & (long['REPE'] < 5)]
+  one_dis['suje'] = one_dis['suje'].astype('category')
+  #Full model
+  halfNormalPrior = Prior('HalfNormal', sigma = 0.1)
+  prior_full = {"REPE" : halfNormalPrior, "1|suje":"narrow"}
+  formula = "p_first ~ REPE + (1|suje)"
+  full_model = bmb.Model(data = one_dis, formula = formula, priors = prior_full)
+  full_fitted = full_model.fit(cores = 1, draws = 3000, chains = 1)
+  #BAYES FACTOR for the Alternative
+  posterior_kde = gaussian_kde(full_fitted.posterior['REPE'][:])
+  posterior_0 = posterior_kde(0) 
+  BF10 = halfnorm.pdf(0,scale = 0.1) / posterior_0
+  print (f'the Bayes Factor is {BF10}')
+  #Null model
+  prior_null = {"1|suje":"narrow"}
+  formula_null = "p_first ~ (1|suje)"
+  null_model = bmb.Model(data = one_dis, 
+                       formula = formula_null, priors = prior_null)
+  null_fitted = null_model.fit(cores = 1, draws = 3000, chains = 1)
+  #Model comparison
+  models_dict1 = {"full" : full_fitted, "null" : null_fitted}
+  df_compare = az.compare(models_dict1, scale = 'deviance')
+  az.plot_compare(df_compare, insample_dev = True);
+  ```
+* TWO DISTRACTORS MODEL COMPARISON
+  ```sh
+  two_dis = long[(long['DISTR'] == 2)&(long['REPE'] < 7)]
+  two_dis['suje'] = two_dis['suje'].astype('category')
+  #FULL MODEL
+  halfNormalPrior = Prior('HalfNormal', sigma = 0.1)
+  prior_full = {"REPE" : halfNormalPrior, "1|suje":"narrow"}
+  formula = "p_first ~ REPE + (1|suje)"
+  full_model = bmb.Model(data = two_dis, formula = formula, priors = prior_full)
+  full_fitted = full_model.fit(cores = 1, draws = 3000, chains = 1)
+  #BAYES FACTOR
+  posterior_kde = gaussian_kde(full_fitted.posterior['REPE'][:])
+  posterior_0 = posterior_kde(0)
+  BF01 = posterior_0 / halfnorm.pdf(0, scale = 0.1)
+  print (f'the Bayes Factor is {BF01}')
+  #Null model
+  prior_null = {"1|suje":"narrow"}
+  formula_null = "p_first ~ (1|suje)"
+  null_model = bmb.Model(data = two_dis,
+                       formula = formula_null, priors = prior_null)
+  null_fitted = null_model.fit(cores = 1, draws = 3000, chains = 1)
+  #Model comparison
+  models_dict2 = {"full" : full_fitted, "null" : null_fitted}
+  df_compare2 = az.compare(models_dict2, scale = 'deviance')
+  az.plot_compare(df_compare2, insample_dev = True);
+  ```
+  
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
