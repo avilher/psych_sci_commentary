@@ -80,7 +80,7 @@ Bambi can be installed PyPI:
   from pathlib import Path
 
   sns.set_context("talk")
-  
+  # Assume we already have our data "dataT_T.csv" loaded as a pandas DataFrame
   #long format
   long = pd.melt(data, id_vars=['suje','DISTR'],
              value_vars=['2','3','4','5','6','7','8','9','10'],
@@ -117,6 +117,12 @@ Bambi can be installed PyPI:
   ```
 * ONE DISTRACTOR MODEL COMPARISON
   ```sh
+  import bambi as bmb
+  import arviz as az
+  from bambi import Prior
+  from scipy.stats import halfnorm
+  from scipy.stats.kde import gaussian_kde
+  
   one_dis = long[(long['DISTR'] == 1) & (long['REPE'] < 5)]
   one_dis['suje'] = one_dis['suje'].astype('category')
   #Full model
@@ -167,7 +173,17 @@ Bambi can be installed PyPI:
   df_compare2 = az.compare(models_dict2, scale = 'deviance')
   az.plot_compare(df_compare2, insample_dev = True);
   ```
-  
+* PLOT DEVIANCE OF MODELS
+  ```sh
+  f, (ax1, ax2) = plt.subplots(1, 2, sharey = True,
+                             gridspec_kw = {'hspace':1})
+  az.plot_compare(df_compare, insample_dev = True,
+                order_by_rank = False, ax = ax1);
+  az.plot_compare(df_compare2, insample_dev = True, ax = ax2);
+  ax1.set_title('One distractor')
+  ax2.set_title('Two distractors')
+  f.set_size_inches(7,4)
+  ```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
